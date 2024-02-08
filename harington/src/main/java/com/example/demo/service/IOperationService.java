@@ -8,4 +8,5 @@ import com.example.demo.model.Operation;
 public interface IOperationService {
 
 	List<Operation> retrieveHistory(Account account);
+	void persisteOperation(Operation operation);
 }

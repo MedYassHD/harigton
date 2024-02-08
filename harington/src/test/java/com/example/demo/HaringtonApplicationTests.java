@@ -9,5 +9,5 @@ class HaringtonApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
+	
 }

@@ -10,10 +10,6 @@ public class ClientItemWriter implements ItemWriter<Client> {
 
 	private final ClientDAO clientDAO;
 
-	public ClientItemWriter() {
-		this.clientDAO = new ClientDAO();
-	}
-
 	public ClientItemWriter(ClientDAO clientDAO) {
 		this.clientDAO = clientDAO;
 	}

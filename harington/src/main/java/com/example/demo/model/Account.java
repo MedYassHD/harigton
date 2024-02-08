@@ -19,27 +19,11 @@ public class Account {
 	private int id;
 	private String accountNumber;
 	private long balance;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id")
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "client_id")
 	private Client client;
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Operation> operations;
-
-	public void withdraw(long amount) {
-		if (amount > 0 && amount <= balance) {
-			balance -= amount;
-		} else {
-			throw new IllegalArgumentException("Invalid withdrawal amount or insufficient funds");
-		}
-	}
-
-	public void deposit(long amount) {
-		if (amount > 0) {
-			balance += amount;
-		} else {
-			throw new IllegalArgumentException("Invalid deposit amount");
-		}
-	}
+	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Operation> operations;
 
 	public long getBalance() {
 		return balance;

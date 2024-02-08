@@ -8,6 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.model.Account;
@@ -19,9 +22,17 @@ public class ClientDAO {
 	private static final String SELECT_ALL_QUERY = "SELECT * FROM client";
 	private static final String SELECT_BY_ID_QUERY = "SELECT * FROM client WHERE id = ?";
 	private static final String SELECT_BY_NAME_QUERY = "SELECT * FROM client WHERE name LIKE ?";
-
+	
+    private final DataSource databaseConnection;
+    private final AccountDAO accountDAO;
+	
+	public ClientDAO( DataSource dataSource,AccountDAO accountDAO ) {
+		this.databaseConnection = dataSource;
+		this.accountDAO = accountDAO;
+	}
+	
 	   public void insertClient(Client client) {
-	        try (Connection connection = DatabaseConnection.getConnection();
+	        try (Connection connection = databaseConnection.getConnection();
 	             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
 
 	            preparedStatement.setString(1, client.getName());
@@ -32,7 +43,7 @@ public class ClientDAO {
 	                Account account = client.getAccount();
 	                if (account != null) {
 //	                    account.setClient(client);
-	                    new AccountDAO().insertAccount(account);  
+	                	accountDAO.insertAccount(account);  
 	                }
 	            }
 	        } catch (SQLException e) {
@@ -41,7 +52,7 @@ public class ClientDAO {
 	    }
 	public List<Client> getClientsByName(String name) {
 		List<Client> clients = new ArrayList<>();
-		try (Connection connection = DatabaseConnection.getConnection();
+		try (Connection connection = databaseConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_NAME_QUERY)) {
 			preparedStatement.setString(1, "%" + name + "%");
 			try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -49,7 +60,6 @@ public class ClientDAO {
 					Client client = new Client();
 					client.setId(resultSet.getInt("id"));
 					client.setName(resultSet.getString("name"));
-					// set other fields
 					clients.add(client);
 				}
 			}
@@ -62,7 +72,7 @@ public class ClientDAO {
 
 	public List<Client> getAllClients() {
 		List<Client> clients = new ArrayList<>();
-		try (Connection connection = DatabaseConnection.getConnection();
+		try (Connection connection = databaseConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_QUERY);
 				ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -80,7 +90,7 @@ public class ClientDAO {
 
 	public Client getClientById(int clientId) {
 		Client client = null;
-		try (Connection connection = DatabaseConnection.getConnection();
+		try (Connection connection = databaseConnection.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID_QUERY)) {
 			preparedStatement.setInt(1, clientId);
 			try (ResultSet resultSet = preparedStatement.executeQuery()) {
